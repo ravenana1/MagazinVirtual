@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>Service Auto | Locations</title>
+<meta charset="utf-8">
+<link rel="stylesheet" type="text/css" media="screen" href="css/reset.css">
+<link rel="stylesheet" type="text/css" media="screen" href="css/style.css">
+<link href="http://fonts.googleapis.com/css?family=Open+Sans+Condensed:700,300" rel="stylesheet" type="text/css">
+<script src="http://maps.googleapis.com/maps/api/js"></script>
+<script src="js/jquery-1.7.min.js"></script>
+<script src="js/jquery.easing.1.3.js"></script>
+
+<script>
+function initMap() {
+  var harta = {
+    center:new google.maps.LatLng(44.383671,26.131421),
+    zoom:17,
+    mapTypeId:google.maps.MapTypeId.ROADMAP
+  };
+  var map=new google.maps.Map(document.getElementById("map"), harta);
+}
+google.maps.event.addDomListener(window, 'load', initMap);
+</script>
+
+<script>
+$(document).ready(function(){
+		$('#button').click(function(){
+            var regID = $('#registerID').val();
+            $.ajax({
+                url: '/ServiceAuto/statusMasina',
+                type: 'GET',
+                data: 'registrationID=' + regID,
+                dataType: 'json',
+                success: function(data) {
+                    //called when successful
+                    console.log(data);
+                    var rez = data
+                    $("form").remove();
+                    $("#h2").append('<br>');
+                    $("#h2").append('<div id="registerID">Registration ID: '+ regID +'</div>');
+                    $("#h2").append('<br>');
+                    $("#h2").append('<div id="date">Data Programare: '+ rez[0]['date'] +'</div>');
+                    $("#h2").append('<br>');
+                    var pret = 0;
+                    for(var i = 0; i < rez.length; i++){
+                        $("#h2").append('<div id="stareMasina">Stare Masina: '+ rez[i]['carState'] +'</div>');
+                        $("#h2").append('<br>');
+						console.log("Stare: " + rez[i]['carState'] + " pret: " + rez[i]['estimatedPrice']);
+                        if(rez[i]["estimatedPrice"] == null && rez.length == 1){
+                            $("#h2").append('<div id="pretEstimat">Masina tocmai inregistrata. Pretul estimat nu este calculat</div>');
+                        }
+                        else if(rez[i]["estimatedPrice"] != null){
+							pret += parseInt(rez[i]["estimatedPrice"]);
+						
+                        }
+                        //$("#h2").append('<br>');
+                    }
+                    $("#h2").append('<div id="pretEstimat">Pret Estimat: '+ pret +' RON</div>');
+                },
+                async: false
+            });
+        });
+});
+
+
+</script>
+
+</head>
+<body>
+<div class="bg">
+  <header>
+    <div class="main wrap">
+      <h1><a href="index.html"><img src="images/logo.png" alt=""></a></h1>
+      <p>Soseaua Berceni 11, Sector 4, Bucuresti<span>+40 72 568 9256</span></p>
+    </div>
+    <nav>
+      <ul class="menu">
+        <li><a href="index.html" class="home"><img src="images/home.jpg" alt=""></a></li>
+        <li><a href="about.html">Despre noi</a></li>
+        <li><a href="maintenance.html">Mentenanta</a></li>
+        <li><a href="repair.html">Reparatii</a></li>
+        <li><a href="price-list.html">Preturi</a></li>
+		<li><a href="price-list-piese.html">Piese</a></li>
+        <li><a href="register.html">Inregistrare</a></li>
+        <li class="current"><a href="verifyCar.html">Status</a></li>
+        <li><a href="locations.html">Contact</a></li>
+      </ul>
+      <div class="clear"></div>
+    </nav>
+  </header>
+  <section id="content">
+    <div class="sub-page">
+      <div class="sub-page-left box-9">
+        <h2 id="h2">Car Status</h2>
+        <form id="form" method="post" action="#">
+          <fieldset>
+            <label>
+              <input type="text" id="registerID" value="Registration ID" onBlur="if(this.value=='') this.value='Registration ID'" onFocus="if(this.value =='Registration ID' ) this.value=''">
+            </label>
+            <div class="btns"><a href="#" class="button">Clear</a><a id="button" class="button">Send</a></div>
+          </fieldset>
+        </form>
+      </div>
+      <div class="sub-page-right">
+        <h2>Locatie</h2>
+        <div>
+          <div id="map" style="width:200px;height:250px;"></div>
+        </div>
+       <dl class="adr">
+          <dt>Soseaua Berceni 11, Sector 4<br>
+            Bucuresti</dt>
+          <dd><span>Telefon:</span>+40 72 568 9256</dd>
+          <dd><span>E-mail:</span><a href="#" class="link">service@auto.com</a></dd>
+        </dl>
+      </div>
+    </div>
+  </section>
+  <footer>Service Auto &copy; 2015 | <a href="#">Privacy Policy</a> | Design by: Secui Ana</footer>
+</div>
+</body>
+</html>
